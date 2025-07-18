@@ -18,11 +18,13 @@ public class Car {
     private String color;
     private int horsepower;
     private double price;
+    private long createdAt;
 
     public Car(String model, String color, int horsepower, double price) {
         this.model = model;
         this.color = color;
         this.horsepower = horsepower;
         this.price = price;
+        this.createdAt = System.currentTimeMillis();
     }
 }
