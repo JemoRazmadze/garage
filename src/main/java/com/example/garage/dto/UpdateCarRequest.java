@@ -6,19 +6,18 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 public class UpdateCarRequest {
-    @NotBlank(message = "Model is mandatory")
+    @NotBlank
     private String model;
 
-    @NotBlank(message = "Color is mandatory")
+    @NotBlank
     private String color;
 
-    @Positive(message = "Horsepower must be positive")
+    @Positive
     private int horsepower;
 
-    @Min(value = 0, message = "Price must be zero or positive")
+    @Min(0)
     private double price;
-
 }

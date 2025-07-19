@@ -1,26 +1,22 @@
 package com.example.garage.controller;
 
-import com.example.garage.dto.CarResponse;
-import com.example.garage.dto.CreateCarRequest;
-import com.example.garage.dto.UpdateCarRequest;
+import com.example.garage.dto.*;
 import com.example.garage.service.CarService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/car")
+@RequiredArgsConstructor
+@RequestMapping("/cars")
 public class CarController {
     private final CarService carService;
 
-    public CarController(CarService carService) {
-        this.carService = carService;
-    }
-
-    @GetMapping("/all-cars")
-    public List<CarResponse> getAllCars() {
-        return carService.getAllCars();
+    @PostMapping("/create")
+    public CarResponse createCar(@RequestBody @Valid CreateCarRequest request) {
+        return carService.createCar(request);
     }
 
     @GetMapping("/search/{id}")
@@ -28,18 +24,18 @@ public class CarController {
         return carService.getCarById(id);
     }
 
-    @GetMapping("/search-color")
-    public List<CarResponse> getCarsByColor(@RequestParam String color) {
-        return carService.findByColor(color);
-    }
-
-    @PostMapping("/create")
-    public CarResponse createCar(@Valid @RequestBody CreateCarRequest request) {
-        return carService.createCar(request);
+    @GetMapping
+    public ResponseEntity<Page<CarResponse>> getCarByParam(@RequestParam(required = false) String color,
+                                                           @RequestParam(required = false) String price,
+                                                           @RequestParam(required = false) String model,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Page<CarResponse> getCarsByParam = carService.getAllCars(color, price, model, page, size);
+        return ResponseEntity.ok(getCarsByParam);
     }
 
     @PutMapping("/update/{id}")
-    public CarResponse updateCar(@PathVariable String id, @Valid @RequestBody UpdateCarRequest request) {
+    public CarResponse updateCar(@PathVariable String id, @RequestBody @Valid UpdateCarRequest request) {
         return carService.updateCar(id, request);
     }
 
