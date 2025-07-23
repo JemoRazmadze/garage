@@ -1,4 +1,4 @@
-package com.example.garage.dto;
+package com.example.garage.request;
 
 import jakarta.validation.constraints.*;
 

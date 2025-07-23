@@ -5,6 +5,8 @@ import com.example.garage.entity.Car;
 import com.example.garage.exceptions.ResourceNotFoundException;
 import com.example.garage.mapper.CarMapper;
 import com.example.garage.repository.CarRepository;
+import com.example.garage.request.CreateCarRequest;
+import com.example.garage.request.UpdateCarRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,7 +41,7 @@ public class CarService {
         return CarMapper.mapToDTO(car);
     }
 
-    public Page<CarResponse> getCars(String model, String color, Double price, int page, int size, String[] sortParams) {
+    public Page<CarResponse> getCars(String model, String color, Double price, int page, int size) {
         Query query = new Query();
 
         List<Criteria> filters = new ArrayList<>();
@@ -48,18 +50,8 @@ public class CarService {
         if (price != null) filters.add(Criteria.where("price").is(price));
         if (!filters.isEmpty()) query.addCriteria(new Criteria().andOperator(filters.toArray(new Criteria[0])));
 
-        Sort sort = Sort.unsorted();
-        if (sortParams != null) {
-            for (String param : sortParams) {
-                String[] parts = param.split(",");
-                if (parts.length == 2) {
-                    sort = sort.and(Sort.by(Sort.Direction.fromString(parts[1]), parts[0]));
-                }
-            }
-        }
-        if (sort.isUnsorted()) {
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "created_at");
 
         Pageable pageable = PageRequest.of(page, size, sort);
         query.with(pageable);

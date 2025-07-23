@@ -1,6 +1,8 @@
 package com.example.garage.controller;
 
 import com.example.garage.dto.*;
+import com.example.garage.request.CreateCarRequest;
+import com.example.garage.request.UpdateCarRequest;
 import com.example.garage.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class CarController {
         return carService.createCar(request);
     }
 
-    @GetMapping("/find-car-by/{id}")
+    @GetMapping("/find-car/{id}")
     public CarResponse getCarById(@PathVariable String id) {
         return carService.getCarById(id);
     }
@@ -30,19 +32,18 @@ public class CarController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) Double price,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String[] sort
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return carService.getCars(model, color, price, page, size, sort);
+        return carService.getCars(model, color, price, page, size);
     }
 
-    @PutMapping("/update-car-by/{id}")
+    @PutMapping("/update-car/{id}")
     public CarResponse updateCar(@PathVariable String id,
                                  @RequestBody @Valid UpdateCarRequest request) {
         return carService.updateCar(id, request);
     }
 
-    @DeleteMapping("/delete-car-by/{id}")
+    @DeleteMapping("/delete-car/{id}")
     public void deleteCar(@PathVariable String id) {
         carService.deleteCar(id);
     }

@@ -9,7 +9,7 @@ public class CarMapper {
                 .id(car.getId())
                 .model(car.getModel())
                 .color(car.getColor())
-                .horsepower(car.getHorsepower())
+                .horsePower(car.getHorsepower())
                 .price(car.getPrice())
                 .createdAt(car.getCreatedAt())
                 .build();
