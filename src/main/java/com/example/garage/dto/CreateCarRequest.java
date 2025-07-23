@@ -1,23 +1,10 @@
 package com.example.garage.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
 
-@Getter
-@Setter
-public class CreateCarRequest {
-    @NotBlank
-    private String model;
-
-    @NotBlank
-    private String color;
-
-    @Positive
-    private int horsepower;
-
-    @Min(0)
-    private double price;
-}
+public record CreateCarRequest(
+        @NotBlank String model,
+        @NotBlank String color,
+        @Min(1) int horsepower,
+        @Positive double price
+) {}
