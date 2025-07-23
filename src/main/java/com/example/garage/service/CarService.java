@@ -5,77 +5,80 @@ import com.example.garage.entity.Car;
 import com.example.garage.exceptions.ResourceNotFoundException;
 import com.example.garage.mapper.CarMapper;
 import com.example.garage.repository.CarRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import com.example.garage.request.CreateCarRequest;
+import com.example.garage.request.UpdateCarRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CarService {
+
     private final CarRepository carRepository;
     private final MongoTemplate mongoTemplate;
 
-    @Autowired
-    public CarService(CarRepository carRepository, MongoTemplate mongoTemplate) {
-        this.carRepository = carRepository;
-        this.mongoTemplate = mongoTemplate;
-    }
-
     public CarResponse createCar(CreateCarRequest request) {
-        Car car = new Car();
-        car.setModel(request.getModel());
-        car.setColor(request.getColor());
-        car.setHorsepower(request.getHorsepower());
-        car.setPrice(request.getPrice());
-        return CarMapper.mapToDTO(carRepository.save(car));
-    }
-
-    public CarResponse getCarById(String id) {
-        Car car = carRepository.findById(id).orElseThrow();
+        Car car = Car.builder()
+                .model(request.model())
+                .color(request.color())
+                .horsepower(request.horsepower())
+                .price(request.price())
+                .createdAt(System.currentTimeMillis())
+                .build();
+        car = carRepository.save(car);
         return CarMapper.mapToDTO(car);
     }
 
-    public Page<CarResponse> getAllCars(String color, String price, String model, int page, int size) {
+    public CarResponse getCarById(String id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        return CarMapper.mapToDTO(car);
+    }
+
+    public Page<CarResponse> getCars(String model, String color, Double price, int page, int size) {
         Query query = new Query();
 
-        if (color != null && !color.isEmpty()) {
-            query.addCriteria(Criteria.where("color").is(color));
-        }
-        if (price != null && !price.isEmpty()) {
-            try {
-                int intPrice = Integer.parseInt(price);
-                query.addCriteria(Criteria.where("price").is(intPrice));
-            } catch (NumberFormatException ignored) {}
-        }
-        if (model != null && !model.isEmpty()) {
-            query.addCriteria(Criteria.where("model").is(model));
-        }
+        List<Criteria> filters = new ArrayList<>();
+        if (model != null) filters.add(Criteria.where("model").is(model));
+        if (color != null) filters.add(Criteria.where("color").is(color));
+        if (price != null) filters.add(Criteria.where("price").is(price));
+        if (!filters.isEmpty()) query.addCriteria(new Criteria().andOperator(filters.toArray(new Criteria[0])));
 
-        long total = mongoTemplate.count(query, Car.class);
-        Pageable pageable = PageRequest.of(page, size);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "created_at");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         query.with(pageable);
 
         List<Car> cars = mongoTemplate.find(query, Car.class);
-        List<CarResponse> carResponses = CarMapper.map(cars);
 
-        return new PageImpl<>(carResponses, pageable, total);
+        Query countQuery = Query.of(query).limit(-1).skip(-1);
+        long total = mongoTemplate.count(countQuery, Car.class);
+
+        List<CarResponse> response = cars.stream()
+                .map(CarMapper::mapToDTO)
+                .toList();
+
+        return new PageImpl<>(response, pageable, total);
     }
 
     public CarResponse updateCar(String id, UpdateCarRequest request) {
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Car not found with id: " + id));
-        car.setModel(request.getModel());
-        car.setColor(request.getColor());
-        car.setHorsepower(request.getHorsepower());
-        car.setPrice(request.getPrice());
-        return CarMapper.mapToDTO(carRepository.save(car));
+                .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        car.setModel(request.model());
+        car.setColor(request.color());
+        car.setHorsepower(request.horsepower());
+        car.setPrice(request.price());
+
+        car = carRepository.save(car);
+        return CarMapper.mapToDTO(car);
     }
 
     public void deleteCar(String id) {
