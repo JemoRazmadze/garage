@@ -41,7 +41,7 @@ public class CarService {
         return CarMapper.mapToDTO(car);
     }
 
-    public Page<CarResponse> getCars(String model, String color, Double price, int page, int size) {
+    public PageResponse getCars(String model, String color, Double price, int page, int size) {
         Query query = new Query();
 
         List<Criteria> filters = new ArrayList<>();
@@ -61,11 +61,16 @@ public class CarService {
         Query countQuery = Query.of(query).limit(-1).skip(-1);
         long total = mongoTemplate.count(countQuery, Car.class);
 
+//        int totalPage = (int) Math.ceil(total/(double)size);
+//        int currentPage = pageable.getPageNumber();
+//        long pageSize = pageable.getPageSize();
+//        long totalElements = total;
+
         List<CarResponse> response = cars.stream()
                 .map(CarMapper::mapToDTO)
                 .toList();
 
-        return new PageImpl<>(response, pageable, total);
+        return new PageResponse(response, pageable, total);
     }
 
     public CarResponse updateCar(String id, UpdateCarRequest request) {
