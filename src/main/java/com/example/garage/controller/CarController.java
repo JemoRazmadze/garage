@@ -6,7 +6,7 @@ import com.example.garage.request.UpdateCarRequest;
 import com.example.garage.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,15 +27,18 @@ public class CarController {
     }
 
     @GetMapping("/find-all-cars")
-    public Page<CarResponse> getCars(
+    public ResponseEntity<PageResponse> getCars(
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String color,
             @RequestParam(required = false) Double price,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return carService.getCars(model, color, price, page, size);
+        PageResponse cars = carService.getCars(model, color, price, page, size);
+//        PageResponse<CarResponse> response = new PageResponse<>(cars);
+        return ResponseEntity.ok(cars);
     }
+
 
     @PutMapping("/update-car/{id}")
     public CarResponse updateCar(@PathVariable String id,
