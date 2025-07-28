@@ -61,11 +61,6 @@ public class CarService {
         Query countQuery = Query.of(query).limit(-1).skip(-1);
         long total = mongoTemplate.count(countQuery, Car.class);
 
-//        int totalPage = (int) Math.ceil(total/(double)size);
-//        int currentPage = pageable.getPageNumber();
-//        long pageSize = pageable.getPageSize();
-//        long totalElements = total;
-
         List<CarResponse> response = cars.stream()
                 .map(CarMapper::mapToDTO)
                 .toList();

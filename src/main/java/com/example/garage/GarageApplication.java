@@ -25,4 +25,6 @@ public class GarageApplication {
 
 
 	//example:     Sort sortAsc = Sort.by(Sort.Direction.ASC, "name");
+
+	// უველა ქრად მეთდზე უნდა გაწერო ვალიადია სადაც ნების მიერ უარყოფითი სემთხვევაში დაგიბრუნებს ერრორს(string - "error message")
 }
