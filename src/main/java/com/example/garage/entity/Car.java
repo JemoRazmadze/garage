@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 public class Car {
     @Id
-    @Field("id")
     private String id;
     @Field("model")
     private String model;

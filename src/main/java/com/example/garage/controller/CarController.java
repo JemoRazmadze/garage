@@ -35,7 +35,6 @@ public class CarController {
             @RequestParam(defaultValue = "10") int size
     ) {
         PageResponse cars = carService.getCars(model, color, price, page, size);
-//        PageResponse<CarResponse> response = new PageResponse<>(cars);
         return ResponseEntity.ok(cars);
     }
 
