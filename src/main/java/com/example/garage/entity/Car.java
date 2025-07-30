@@ -22,7 +22,7 @@ public class Car {
     @Field("color")
     private String color;
     @Field("horse_power")
-    private int horsepower;
+    private int horsePower;
     @Field("price")
     private double price;
     @Field("created_at")

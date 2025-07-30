@@ -1,4 +1,4 @@
-package com.example.garage.dto;
+package com.example.garage.dto.car;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
