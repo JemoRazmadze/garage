@@ -1,6 +1,5 @@
-package com.example.garage.dto.common;
+package com.example.garage.dto;
 
-import com.example.garage.dto.car.CarResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,6 @@
 package com.example.garage.mapper;
 
-import com.example.garage.dto.car.CarResponse;
+import com.example.garage.dto.CarResponse;
 import com.example.garage.entity.Car;
 
 public class CarMapper {

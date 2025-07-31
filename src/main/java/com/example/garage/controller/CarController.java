@@ -1,9 +1,9 @@
 package com.example.garage.controller;
 
-import com.example.garage.dto.car.CarResponse;
-import com.example.garage.dto.car.CreateCarRequest;
-import com.example.garage.dto.car.UpdateCarRequest;
-import com.example.garage.dto.common.PageResponse;
+import com.example.garage.dto.CarResponse;
+import com.example.garage.request.CreateCarRequest;
+import com.example.garage.request.UpdateCarRequest;
+import com.example.garage.dto.PageResponse;
 import com.example.garage.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +31,11 @@ public class CarController {
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String color,
             @RequestParam(required = false) Double price,
-            @RequestParam(required = false) Integer horsepower,
+            @RequestParam(required = false) Integer horsePower,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PageResponse cars = carService.getCars(model, color, price, horsepower, page, size);
+        PageResponse cars = carService.getCars(model, color, price, horsePower, page, size);
         return ResponseEntity.ok(cars);
     }
 

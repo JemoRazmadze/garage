@@ -1,4 +1,4 @@
-package com.example.garage.dto.car;
+package com.example.garage.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 public class CreateCarRequest{
     private String model;
     private String color;
-    Integer horsePower;
-    Double price;
+    private Integer horsePower;
+    private Double price;
 }
 
