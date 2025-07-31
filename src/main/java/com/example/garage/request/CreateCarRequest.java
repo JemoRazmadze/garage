@@ -1,10 +1,14 @@
 package com.example.garage.request;
 
-import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
-public record CreateCarRequest(
-        @NotBlank String model,
-        @NotBlank String color,
-        @Min(1) int horsepower,
-        @Positive double price
-) {}
+@Getter
+@Setter
+public class CreateCarRequest{
+    private String model;
+    private String color;
+    private Integer horsePower;
+    private Double price;
+}
+

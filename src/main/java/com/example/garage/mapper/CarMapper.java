@@ -4,14 +4,18 @@ import com.example.garage.dto.CarResponse;
 import com.example.garage.entity.Car;
 
 public class CarMapper {
+
     public static CarResponse mapToDTO(Car car) {
-        return CarResponse.builder()
-                .id(car.getId())
-                .model(car.getModel())
-                .color(car.getColor())
-                .horsePower(car.getHorsepower())
-                .price(car.getPrice())
-                .createdAt(car.getCreatedAt())
-                .build();
+
+        CarResponse response = new CarResponse();
+
+        response.setId(car.getId());
+        response.setModel(car.getModel());
+        response.setColor(car.getColor());
+        response.setHorsePower(car.getHorsePower());
+        response.setPrice(car.getPrice());
+        response.setCreatedAt(car.getCreatedAt());
+
+        return response;
     }
 }
