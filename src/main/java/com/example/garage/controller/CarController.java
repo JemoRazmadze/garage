@@ -8,16 +8,21 @@ import com.example.garage.service.CarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/car")
 public class CarController {
 
+    private static final Logger log = LoggerFactory.getLogger(CarController.class);
+
     private final CarService carService;
 
     @PostMapping("/create")
     public CarResponse createCar(@RequestBody CreateCarRequest request) {
+        log.info("Received request to create car: {}", request);
         return carService.createCar(request);
     }
 
@@ -48,6 +53,7 @@ public class CarController {
 
     @DeleteMapping("/delete-car/{id}")
     public void deleteCar(@PathVariable String id) {
+        log.info("Received request to delete car with ID: {}", id);
         carService.deleteCar(id);
     }
 }

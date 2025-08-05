@@ -14,7 +14,8 @@ import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarService {
 
+    private static final Logger log = LoggerFactory.getLogger(CarService.class);
+
     private final CarRepository carRepository;
     private final MongoTemplate mongoTemplate;
 
     public CarResponse createCar(CreateCarRequest request) {
+        log.info("Creating new car with model: {}", request.getModel());
         validation(request);
         Car car = new Car();
         car.setPrice(request.getPrice());
@@ -33,23 +37,29 @@ public class CarService {
         car.setModel(request.getModel());
         car.setHorsePower(request.getHorsePower());
         car = carRepository.save(car);
+        log.debug("Created car details: {}", car);
         return CarMapper.mapToDTO(car);
     }
 
     public CarResponse getCarById(String id) {
+        log.info("Fetching car with ID: {}", id);
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("მანქანა ვერ მოიძებნა"));
+                .orElseThrow(() -> {log.error("Car not found with ID: {}", id);
+        return new ResourceNotFoundException("მანქანა ვერ მოიძებნა");});
+        log.debug("Found car: {}", car);
         return CarMapper.mapToDTO(car);
     }
 
     public PageResponse getCars(String model, String color, Double price, Integer horsePower, int page, int size) {
+        log.info("Getting cars with filters - model: {}, color: {}, price: {}, horsePower: {}, page: {}, size: {}",
+                model, color, price, horsePower, page, size);
         Query query = new Query();
 
         List<Criteria> filters = new ArrayList<>();
         if (model != null) filters.add(Criteria.where("model").is(model));
         if (color != null) filters.add(Criteria.where("color").is(color));
         if (price != null) filters.add(Criteria.where("price").is(price));
-        if(price != null) filters.add(Criteria.where("horsepower").gt(horsePower));
+        if(horsePower != null) filters.add(Criteria.where("horsepower").gt(horsePower));
         if (!filters.isEmpty()) query.addCriteria(new Criteria().andOperator(filters.toArray(new Criteria[0])));
 
 
@@ -67,12 +77,17 @@ public class CarService {
                 .map(CarMapper::mapToDTO)
                 .toList();
 
+        log.debug("Found {} cars", response.size());
+
         return new PageResponse(response, pageable, total);
     }
 
     public CarResponse updateCar(String id, UpdateCarRequest request) {
+        log.info("Updating car with ID: {}", id);
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("მანქანა ვერ მოიძებნა"));
+                .orElseThrow(() -> {
+                    log.error("Cannot update: car not found with ID: {}", id);
+                    return new ResourceNotFoundException("მანქანა ვერ მოიძებნა");});
 
         car.setModel(request.getModel());
         car.setColor(request.getColor());
@@ -80,30 +95,42 @@ public class CarService {
         car.setPrice(request.getPrice());
 
         car = carRepository.save(car);
+        log.info("Car updated: {}", car.getId());
         return CarMapper.mapToDTO(car);
     }
 
     public void deleteCar(String id) {
+        log.info("Deleting car with ID: {}", id);
         if (!carRepository.existsById(id)) {
+            log.warn("Tried to delete non-existing car with ID: {}", id);
             throw new ResourceNotFoundException(Constant.CAR_NOT_FOUND);
         }
         carRepository.deleteById(id);
+        log.info("Car deleted with ID: {}", id);
     }
 
 
     public void validation(CreateCarRequest request){
 
-        if (request.getModel() == null || request.getModel().isEmpty())
+        if (request.getModel() == null || request.getModel().isEmpty()) {
+            log.error("Validation failed: model field is empty");
             throw new ResourceNotFoundException(Constant.MODEL_ERROR_MESSAGE);
+        }
 
-        if (request.getColor() == null || request.getColor().isEmpty())
+        if (request.getColor() == null || request.getColor().isEmpty()) {
+            log.error("Validation failed: color field is empty");
             throw new ResourceNotFoundException(Constant.COLOR_ERROR_MESSAGE);
+        }
 
-        if(request.getHorsePower() == null || request.getHorsePower() <= 0)
+        if(request.getHorsePower() == null || request.getHorsePower() <= 0) {
+            log.error("Validation failed: horsepower invalid");
             throw new ResourceNotFoundException(Constant.HP_ERROR_MESSAGE);
+        }
 
-        if(request.getPrice() == null || request.getPrice() <= 0)
+        if(request.getPrice() == null || request.getPrice() <= 0) {
+            log.error("Validation failed: price invalid");
             throw new ResourceNotFoundException(Constant.PRICE_ERROR_MESSAGE);
+        }
 
     }
 }
