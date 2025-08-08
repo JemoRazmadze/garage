@@ -10,8 +10,12 @@ import com.example.garage.repository.CarRepository;
 import com.example.garage.request.CreateCarRequest;
 import com.example.garage.request.UpdateCarRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -28,6 +32,8 @@ public class CarService {
     private final CarRepository carRepository;
     private final MongoTemplate mongoTemplate;
 
+    @CacheEvict(value = "carList", allEntries = true)
+    @CachePut(value = "cars", key = "#result.id")
     public CarResponse createCar(CreateCarRequest request) {
         log.info("Creating new car with model: {}", request.getModel());
         validation(request);
@@ -41,6 +47,7 @@ public class CarService {
         return CarMapper.mapToDTO(car);
     }
 
+    @Cacheable(value = "cars", key = "#id")
     public CarResponse getCarById(String id) {
         log.info("Fetching car with ID: {}", id);
         Car car = carRepository.findById(id)
@@ -50,6 +57,7 @@ public class CarService {
         return CarMapper.mapToDTO(car);
     }
 
+    @Cacheable(value = "carList", key = "T(java.util.Objects).hash(#model, #color, #price, #horsePower, #page, #size)")
     public PageResponse getCars(String model, String color, Double price, Integer horsePower, int page, int size) {
         log.info("Getting cars with filters - model: {}, color: {}, price: {}, horsePower: {}, page: {}, size: {}",
                 model, color, price, horsePower, page, size);
@@ -82,6 +90,7 @@ public class CarService {
         return new PageResponse(response, pageable, total);
     }
 
+    @CachePut(value = "cars", key = "#result.id")
     public CarResponse updateCar(String id, UpdateCarRequest request) {
         log.info("Updating car with ID: {}", id);
         Car car = carRepository.findById(id)
@@ -99,6 +108,7 @@ public class CarService {
         return CarMapper.mapToDTO(car);
     }
 
+    @CacheEvict(value = {"cars", "carList"}, allEntries = true)
     public void deleteCar(String id) {
         log.info("Deleting car with ID: {}", id);
         if (!carRepository.existsById(id)) {
