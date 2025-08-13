@@ -1,25 +1,26 @@
 package com.example.garage.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CarResponse {
     private String id;
     private String model;
     private String color;
-    private int horsepower;
+
+    @JsonProperty("horse_power")
+    private int horsePower;
+
     private double price;
 
-    public CarResponse() {}
+    @JsonProperty("created_at")
+    private String createdAt;
 
-    public CarResponse(String id, String model, String color, int horsepower, double price) {
-        this.id = id;
-        this.model = model;
-        this.color = color;
-        this.horsepower = horsepower;
-        this.price = price;
-    }
-
+    @JsonProperty("car_details")
+    private CarDetailsResponse details;
 }
+
