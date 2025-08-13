@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -19,12 +19,12 @@ public class PageResponse {
     @JsonProperty("total_elements")
     private long totalElements;
 
-    private Object content;
+    private Map<String, CarResponse> content;
 
-    public PageResponse(List<CarResponse> response, Pageable pageable, long total) {
+    public PageResponse(Map<String, CarResponse> content, Pageable pageable, long total) {
         this.currentPage = pageable.getPageNumber();
-        this.totalPages = pageable.getPageSize();
+        this.totalPages = (int) Math.ceil((double) total / pageable.getPageSize());
         this.totalElements = total;
-        this.content = response;
+        this.content = content;
     }
 }
