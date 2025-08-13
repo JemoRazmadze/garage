@@ -25,7 +25,13 @@ public class Car {
     private int horsePower;
     @Field("price")
     private double price;
+    @Field
+    private String carDisc;
+    @Field
+    private CarDetails carSetting;
     @Field("created_at")
     private Long createdAt;
+    @Field("car_details")
+    private CarDetails carDetails;
 }
 

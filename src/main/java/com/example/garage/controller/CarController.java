@@ -37,10 +37,11 @@ public class CarController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Integer horsePower,
+            @RequestParam(required = false) Integer carDisc,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PageResponse cars = carService.getCars(model, color, price, horsePower, page, size);
+        PageResponse cars = carService.getCars(model, color, price, horsePower,carDisc,page, size);
         return ResponseEntity.ok(cars);
     }
 
